@@ -1,0 +1,35 @@
+name: CI
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Download ngrok
+      run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+
+    - name: Extract ngrok
+      run: Expand-Archive ngrok.zip
+
+    - name: Set up ngrok auth
+      run: .\ngrok\ngrok.exe authtoken 2TtsXlq7nmodmnQ4eCQkt2yUWLS_5phyzprkREQECsPQHTeq7
+
+    - name: Enable TS
+      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+
+    - name: Enable Remote Desktop firewall rule
+      run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+    - name: Set RDP User Authentication
+      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+
+    - name: Set Local User Password
+      run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+
+    - name: Create ngrok Tunnel for RDP
+      run: |
+       while ($true) {
+       .\ngrok\ngrok.exe tcp 3389
+       Start-Sleep -Seconds 86400  # Delay for 5 minutes before attempting to reconnect
+       }
