@@ -31,5 +31,5 @@ jobs:
       run: |
        while ($true) {
        .\ngrok\ngrok.exe tcp 3389
-       Start-Sleep -Seconds 86400  # Delay for 5 minutes before attempting to reconnect
+       Start-Sleep -Seconds 99999999999999  # Delay for 1157407407.4 day before attempting to reconnect
        }
